@@ -1,8 +1,50 @@
-# 🚀 Quick Start - Mini-TP Allure
+# 🚀 Quick Start - TP CI/CD Complet
 
 ## Status : ✅ CONFIGURATION COMPLÈTE
 
 ### Branche actuelle
+`tp-prometheus` - Prête avec Allure + Prometheus + Grafana
+
+### 🆕 Nouveau : TP Prometheus + Grafana
+Pour le TP monitoring avec Prometheus et Grafana, voir **[DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md)**
+
+---
+
+## 📚 Guides Disponibles
+
+| Guide | Description | Usage |
+|-------|-------------|-------|
+| **[DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md)** | Guide rapide TP Prometheus | ⭐ Commencer ici pour le monitoring |
+| **[PROMETHEUS_GRAFANA_TP.md](./PROMETHEUS_GRAFANA_TP.md)** | Guide complet étape par étape | Documentation complète |
+| **[GRAFANA_DASHBOARD.md](./GRAFANA_DASHBOARD.md)** | Création du dashboard | Configuration des visualisations |
+| **[GRAFANA_ALERTS.md](./GRAFANA_ALERTS.md)** | Configuration des alertes | Système d'alerting |
+| **[TESTS_VALIDATION.md](./TESTS_VALIDATION.md)** | Tests de validation | Vérifier l'installation |
+| **[TP_RECAPITULATIF.md](./TP_RECAPITULATIF.md)** | Résumé et checklist | Vue d'ensemble |
+
+---
+
+## ⚡ Démarrage Ultra-Rapide (Monitoring)
+
+```powershell
+# Terminal 1 : Exporteur
+npm run exporter
+
+# Terminal 2 : Tests
+npm test
+
+# Terminal 3 : Vérifier métriques
+Invoke-WebRequest http://localhost:9464/metrics
+```
+
+Voir **[DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md)** pour Prometheus et Grafana.
+
+---
+
+# 🚀 Quick Start - Mini-TP Allure (Précédent)
+
+## Status : ✅ CONFIGURATION COMPLÈTE
+
+### Branche pour Allure uniquement
 `add-reporting` - Prête à être merge
 
 ---

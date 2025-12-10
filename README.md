@@ -11,6 +11,10 @@ suites (unit, integration, and end-to-end).
   - Unit tests in `tests/unit/greeting.test.js`.
   - Integration tests in `tests/integration/app.test.js`.
   - End-to-end tests in `tests/e2e/e2e.test.js`.
+- **Monitoring & Observability**:
+  - Prometheus metrics exporter for test results
+  - Grafana dashboards for visualization
+  - Automated alerting system
 - **Linting**: Configured with ESLint (via `.eslintrc.js` and `.eslintignore`).
 - **Node.js Version Management**: Uses `.nvmrc` to specify Node.js v22.19.0.
 
@@ -47,6 +51,7 @@ Run tests with Jest:
 
 - All tests: `npm test`
 - With coverage and Allure: `npm run test:allure`
+- Trigger alarm tests: `npm run test:trigger-alarm`
 - Unit tests: `npm test -- tests/unit/`
 - Integration tests: `npm test -- tests/integration/`
 - E2E tests: `npm test -- tests/e2e/`
@@ -59,6 +64,54 @@ This project uses Allure for test reporting:
 - Coverage reports are generated in `coverage/`
 - In CI/CD: Allure reports are published to GitHub Pages on merge to master
 - View the latest report: `https://[your-username].github.io/cicd-tp/allure-report/`
+
+## Monitoring & Observability
+
+This project includes a complete monitoring stack with Prometheus and Grafana:
+
+### Quick Start
+
+See **[DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md)** for a quick guide.
+
+### Prometheus Exporter
+
+Export test metrics to Prometheus:
+
+```bash
+npm run exporter
+```
+
+This starts a metrics server on http://localhost:9464/metrics exposing:
+- `tests_total` - Total number of tests executed
+- `tests_passed` - Number of tests that passed
+- `tests_failed` - Number of tests that failed
+- `tests_skipped` - Number of tests that were skipped
+- `tests_avg_duration_ms` - Average test execution duration
+
+### Grafana Dashboard
+
+1. Install Grafana: https://grafana.com/grafana/download
+2. Start Grafana (default: http://localhost:3000)
+3. Add Prometheus data source: http://localhost:9090
+4. Import the dashboard from `grafana-dashboard.json` or create manually
+
+See **[GRAFANA_DASHBOARD.md](./GRAFANA_DASHBOARD.md)** for detailed instructions.
+
+### Alerting
+
+Configure alerts in Grafana for:
+- Tests skipped > 0
+- Tests failed > 0
+- Test execution time increased by 30%
+
+See **[GRAFANA_ALERTS.md](./GRAFANA_ALERTS.md)** for detailed instructions.
+
+### Complete TP Guide
+
+For the full Prometheus + Grafana TP, see:
+- **[PROMETHEUS_GRAFANA_TP.md](./PROMETHEUS_GRAFANA_TP.md)** - Complete guide
+- **[PROMETHEUS_QUERIES.md](./PROMETHEUS_QUERIES.md)** - PromQL query examples
+- **[TP_RECAPITULATIF.md](./TP_RECAPITULATIF.md)** - Summary and checklist
 
 ## Linting
 

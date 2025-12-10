@@ -6,6 +6,8 @@
     "lint": "eslint .",
     "test": "jest",
     "test:allure": "jest --coverage",
+    "test:trigger-alarm": "jest tests/alarm/alarm.test.js",
+    "exporter": "node src/prometheusExporter.js",
     "start": "node src/server.js"
   },
   "dependencies": {

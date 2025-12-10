@@ -1,0 +1,11 @@
+# filepath: c:\Users\cvanzetta2023\tp\cicd-tp\prometheus.yml
+# Configuration Prometheus pour le TP CI/CD
+
+global:
+  scrape_interval: 5s      # Collecte toutes les 5 secondes
+  evaluation_interval: 5s  # Évaluation des règles toutes les 5 secondes
+
+scrape_configs:
+  - job_name: 'test-metrics'
+    static_configs:
+      - targets: ['localhost:9464']  # Exporteur Prometheus pour les tests
