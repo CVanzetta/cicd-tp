@@ -54,7 +54,7 @@ describe("E2E GET /hello", () => {
   it("returns 404 for non-existent route", async () => {
     try {
       await axios.get(`${baseURL}/nonexistent`);
-      fail("Should have thrown 404 error");
+      throw new Error("Should have thrown 404 error");
     } catch (error) {
       expect(error.response.status).toBe(404);
     }
@@ -126,7 +126,7 @@ describe("E2E Server Behavior", () => {
   it("returns 404 for unsupported HTTP methods on /hello", async () => {
     try {
       await axios.put(`${baseURL}/hello`);
-      fail("Should have thrown error");
+      throw new Error("Should have thrown error");
     } catch (error) {
       expect(error.response.status).toBe(404);
     }
@@ -135,7 +135,7 @@ describe("E2E Server Behavior", () => {
   it("returns 404 for DELETE method on /hello", async () => {
     try {
       await axios.delete(`${baseURL}/hello`);
-      fail("Should have thrown error");
+      throw new Error("Should have thrown error");
     } catch (error) {
       expect(error.response.status).toBe(404);
     }
