@@ -46,9 +46,19 @@ The server runs on port 3000 (or `process.env.PORT`). Endpoints:
 Run tests with Jest:
 
 - All tests: `npm test`
+- With coverage and Allure: `npm run test:allure`
 - Unit tests: `npm test -- tests/unit/`
 - Integration tests: `npm test -- tests/integration/`
 - E2E tests: `npm test -- tests/e2e/`
+
+### Allure Reports
+
+This project uses Allure for test reporting:
+
+- Test results are automatically generated in `allure-results/` during test execution
+- Coverage reports are generated in `coverage/`
+- In CI/CD: Allure reports are published to GitHub Pages on merge to master
+- View the latest report: `https://[your-username].github.io/cicd-tp/allure-report/`
 
 ## Linting
 
@@ -73,9 +83,37 @@ npm run lint
 - **Runtime**: Express (web server), Axios (HTTP client), Supertest (testing utility).
 - **Dev**: ESLint (linting), Jest (testing).
 
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration:
+
+- **On Pull Requests**:
+  - Runs linting and all tests
+  - Generates Allure test results and coverage
+  - Posts automated comment with test results and coverage summary
+  - Uploads artifacts (allure-results, coverage)
+
+- **On Merge to Master**:
+  - Runs full pipeline
+  - Generates complete Allure report
+  - Publishes report to GitHub Pages
+  - Archives artifacts
+
+### GitHub Pages Setup
+
+To enable Allure report publishing:
+
+1. Go to repository Settings → Pages
+2. Source: Deploy from a branch
+3. Branch: `gh-pages` / `root`
+4. Save
+
+Reports will be available at: `https://[your-username].github.io/cicd-tp/allure-report/`
+
 ## Contributing
 
 1. Fork the repo.
 2. Create a feature branch.
 3. Run tests and linting.
 4. Submit a pull request.
+5. Check automated PR comment for test results.

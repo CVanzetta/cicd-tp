@@ -1,1 +1,4 @@
 allure-results/
+allure-report/
+coverage/
+node_modules/
