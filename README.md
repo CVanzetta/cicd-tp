@@ -1,172 +1,263 @@
-# TP CI/CD
+# TP CI/CD - Monitoring avec Prometheus & Grafana
 
-A Node.js application providing a simple greeting service with a REST API. It includes a server built with Express, greeting logic, and comprehensive test
-suites (unit, integration, and end-to-end).
+Application Node.js avec monitoring complet des tests via Prometheus et Grafana.
 
-## Features
+---
 
-- **Greeting Functionality**: Generates personalized greetings via `src/greeting.js`.
-- **REST API Server**: Built with Express in `src/server.js`, supporting GET and POST endpoints for greetings.
-- **Testing**: Full test coverage with Jest:
-  - Unit tests in `tests/unit/greeting.test.js`.
-  - Integration tests in `tests/integration/app.test.js`.
-  - End-to-end tests in `tests/e2e/e2e.test.js`.
-- **Monitoring & Observability**:
-  - Prometheus metrics exporter for test results
-  - Grafana dashboards for visualization
-  - Automated alerting system
-- **Linting**: Configured with ESLint (via `.eslintrc.js` and `.eslintignore`).
-- **Node.js Version Management**: Uses `.nvmrc` to specify Node.js v22.19.0.
+## Objectifs du TP
 
-## Prerequisites
+1.  Générer des rapports Allure pour les tests
+2.  Collecter les métriques de tests avec Prometheus
+3.  Visualiser les métriques dans Grafana (dashboard + alertes)
+4.  Tester le système d'alertes
 
-- Node.js ≥22.19.0 (use `.nvmrc` with nvm: `nvm use`).
-- npm (included with Node.js).
+---
 
-## Installation
+## Prérequis
 
-1. Fork the repository:
-2. Install dependencies:
+- **Node.js** ≥22.19.0
+- **Prometheus** : [Télécharger](https://prometheus.io/download/)
+- **Grafana OSS** : [Télécharger](https://grafana.com/grafana/download)
 
-```
+---
+
+##  Installation
+
+### 1. Cloner et installer les dépendances
+
+```bash
+git clone <repo-url>
+cd cicd-tp
 npm install
 ```
 
-## Usage
+### 2. Installer Prometheus et Grafana
 
-Start the server:
+**Windows :**
+- Prometheus : Télécharger, extraire, lancer avec `prometheus --config.file=prometheus.yml`
+- Grafana : Installer le .msi, le service démarre automatiquement
 
+**macOS :**
+```bash
+brew install prometheus grafana
+brew services start grafana
 ```
-npm start
+
+**Linux :**
+```bash
+sudo apt-get install prometheus grafana
+sudo systemctl start grafana-server
 ```
 
-The server runs on port 3000 (or `process.env.PORT`). Endpoints:
+---
 
-- `GET /hello/:name?`: Returns a greeting (e.g., "Hello world!" or "Hello world! From [name]").
-- `POST /hello`: Expects `x-name` header for the name.
+## Démarrage Rapide
 
-## Testing
-
-Run tests with Jest:
-
-- All tests: `npm test`
-- With coverage and Allure: `npm run test:allure`
-- Trigger alarm tests: `npm run test:trigger-alarm`
-- Unit tests: `npm test -- tests/unit/`
-- Integration tests: `npm test -- tests/integration/`
-- E2E tests: `npm test -- tests/e2e/`
-
-### Allure Reports
-
-This project uses Allure for test reporting:
-
-- Test results are automatically generated in `allure-results/` during test execution
-- Coverage reports are generated in `coverage/`
-- In CI/CD: Allure reports are published to GitHub Pages on merge to master
-- View the latest report: `https://[your-username].github.io/cicd-tp/allure-report/`
-
-## Monitoring & Observability
-
-This project includes a complete monitoring stack with Prometheus and Grafana:
-
-### Quick Start
-
-See **[DEMARRAGE_RAPIDE.md](./DEMARRAGE_RAPIDE.md)** for a quick guide.
-
-### Prometheus Exporter
-
-Export test metrics to Prometheus:
-
+### Terminal 1 : Exporteur Prometheus
 ```bash
 npm run exporter
 ```
+ Démarre sur http://localhost:9464/metrics
 
-This starts a metrics server on http://localhost:9464/metrics exposing:
-- `tests_total` - Total number of tests executed
-- `tests_passed` - Number of tests that passed
-- `tests_failed` - Number of tests that failed
-- `tests_skipped` - Number of tests that were skipped
-- `tests_avg_duration_ms` - Average test execution duration
+### Terminal 2 : Prometheus
+```bash
+prometheus --config.file=prometheus.yml
+```
+ Interface sur http://localhost:9090
 
-### Grafana Dashboard
+### Terminal 3 : Tests
+```bash
+npm test
+```
+ Génère les métriques
 
-1. Install Grafana: https://grafana.com/grafana/download
-2. Start Grafana (default: http://localhost:3000)
-3. Add Prometheus data source: http://localhost:9090
-4. Import the dashboard from `grafana-dashboard.json` or create manually
+### Grafana
+ Déjà démarré sur http://localhost:3000 (login: admin/admin)
 
-See **[GRAFANA_DASHBOARD.md](./GRAFANA_DASHBOARD.md)** for detailed instructions.
+---
 
-### Alerting
+## Configuration Grafana
 
-Configure alerts in Grafana for:
-- Tests skipped > 0
-- Tests failed > 0
-- Test execution time increased by 30%
+### 1. Connecter Prometheus
 
-See **[GRAFANA_ALERTS.md](./GRAFANA_ALERTS.md)** for detailed instructions.
+1. Grafana → **☰** → **Connections** → **Data sources**
+2. **Add data source** → **Prometheus**
+3. URL : `http://localhost:9090`
+4. **Save & Test** ✅
 
-### Complete TP Guide
+### 2. Créer le Dashboard
 
-For the full Prometheus + Grafana TP, see:
-- **[PROMETHEUS_GRAFANA_TP.md](./PROMETHEUS_GRAFANA_TP.md)** - Complete guide
-- **[PROMETHEUS_QUERIES.md](./PROMETHEUS_QUERIES.md)** - PromQL query examples
-- **[TP_RECAPITULATIF.md](./TP_RECAPITULATIF.md)** - Summary and checklist
+1. **☰** → **Dashboards** → **New Dashboard**
+2. Créer 5 panels :
 
-## Linting
+| Panel | Query | Type |
+|-------|-------|------|
+| **Total Tests** | `tests_total` | Stat |
+| **Tests Passed** | `tests_passed` | Stat |
+| **Tests Failed** | `tests_failed` | Stat |
+| **Tests Skipped** | `tests_skipped` | Stat |
+| **Average Duration** | `tests_avg_duration_ms` | Time series |
 
-Check code quality:
+3. **Save dashboard** : `Test Metrics Dashboard`
+
+### 3. Configurer les Alertes
+
+1. **☰** → **Alerting** → **Contact points** → Créer un contact point
+2. **Alert rules** → Créer 3 alertes :
+
+| Nom | Query | Condition |
+|-----|-------|-----------|
+| **Tests Skipped Alert** | `tests_skipped` | > 0 |
+| **Tests Failed Alert** | `tests_failed` | > 0 |
+| **Slow Tests Alert** | `tests_avg_duration_ms` | > 150 |
+
+### 4. Tester les Alertes
+
+```bash
+npm run test:trigger-alarm
+```
+
+Les alertes passent en état **Firing** 🔥 dans Grafana
+
+---
+
+## Métriques Disponibles
+
+| Métrique | Description |
+|----------|-------------|
+| `tests_total` | Nombre total de tests exécutés |
+| `tests_passed` | Tests réussis |
+| `tests_failed` | Tests échoués |
+| `tests_skipped` | Tests sautés |
+| `tests_avg_duration_ms` | Temps moyen d'exécution (ms) |
+
+---
+
+## URLs Importantes
+
+| Service | URL | Identifiants |
+|---------|-----|--------------|
+| **Exporteur Prometheus** | http://localhost:9464/metrics | - |
+| **Prometheus** | http://localhost:9090 | - |
+| **Grafana** | http://localhost:3000 | admin/admin |
+| **Serveur Express** | http://localhost:3000/hello | - |
+
+---
+
+## Scripts npm Disponibles
+
+```bash
+npm test                    # Exécuter tous les tests
+npm run exporter           # Lancer l'exporteur Prometheus
+npm run test:trigger-alarm # Lancer les tests d'alarme
+npm run lint               # Vérifier le code avec ESLint
+npm start                  # Démarrer le serveur Express
+```
+
+---
+
+## Checklist de Validation
+
+- [ ] Exporteur actif (port 9464)
+- [ ] Prometheus actif (port 9090)
+- [ ] Prometheus voit l'exporteur (target UP sur http://localhost:9090/targets)
+- [ ] Grafana actif (port 3000)
+- [ ] Data source Prometheus connectée dans Grafana
+- [ ] Dashboard créé avec 5 panels
+- [ ] Les 5 panels affichent des données
+- [ ] 3 alertes configurées
+- [ ] `npm run test:trigger-alarm` déclenche les alertes
+
+---
+
+## Dépannage
+
+### L'exporteur ne démarre pas
+```bash
+# Vérifier si le port est occupé
+netstat -ano | findstr :9464
+# Tuer le processus si nécessaire
+Stop-Process -Id <PID> -Force
+```
+
+### Prometheus ne voit pas l'exporteur
+- Vérifier http://localhost:9090/targets
+- La target `test-metrics` doit être **UP** (vert)
+- Vérifier que l'exporteur tourne
+- Redémarrer Prometheus
+
+### Pas de données dans Grafana
+1. Lancer `npm test` pour générer des données
+2. Vérifier que l'exporteur et Prometheus tournent
+3. Attendre 5-10 secondes pour le scraping
+4. Vérifier la time range dans Grafana (Last 15 minutes)
+
+### Les alertes ne se déclenchent pas
+1. Vérifier les queries dans Prometheus (http://localhost:9090)
+2. Vérifier les seuils (thresholds)
+3. Attendre le délai d'évaluation (10s)
+4. Lancer `npm run test:trigger-alarm`
+
+---
+
+## Structure du Projet
 
 ```
-npm run lint
+cicd-tp/
+├── src/
+│   ├── prometheusExporter.js    # Exporteur de métriques Prometheus
+│   ├── server.js                 # Serveur Express
+│   └── greeting.js               # Logique métier
+├── tests/
+│   ├── alarm/                    # Tests pour déclencher les alertes
+│   ├── unit/                     # Tests unitaires
+│   ├── integration/              # Tests d'intégration
+│   └── e2e/                      # Tests end-to-end
+├── prometheus.yml                # Configuration Prometheus
+├── grafana-dashboard.json        # Template dashboard Grafana (optionnel)
+├── package.json                  # Scripts et dépendances
+└── README.md                     # Ce fichier
 ```
 
-## Project Structure
+---
 
-- `src/greeting.js`: Core greeting logic.
-- `src/server.js`: Express server setup.
-- `tests/`: Test suites (unit, integration, e2e).
-- `.eslintrc.js`: ESLint configuration.
-- `.eslintignore`: Files/directories excluded from linting.
-- `.nvmrc`: Node.js version specification.
-- `package.json`: Project metadata, dependencies, and scripts.
+## Ressources
 
-## Dependencies
+- [Prometheus Documentation](https://prometheus.io/docs/)
+- [Grafana Documentation](https://grafana.com/docs/)
+- [PromQL Guide](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+- [Jest Documentation](https://jestjs.io/docs/getting-started)
 
-- **Runtime**: Express (web server), Axios (HTTP client), Supertest (testing utility).
-- **Dev**: ESLint (linting), Jest (testing).
+---
 
-## CI/CD Pipeline
+## Fonctionnalités de l'Application
 
-The project uses GitHub Actions for continuous integration:
+### API REST
 
-- **On Pull Requests**:
-  - Runs linting and all tests
-  - Generates Allure test results and coverage
-  - Posts automated comment with test results and coverage summary
-  - Uploads artifacts (allure-results, coverage)
+**GET /hello/:name?**
+- Sans paramètre : `Hello world!`
+- Avec nom : `Hello world! From {name}`
 
-- **On Merge to Master**:
-  - Runs full pipeline
-  - Generates complete Allure report
-  - Publishes report to GitHub Pages
-  - Archives artifacts
+**POST /hello**
+- Header `x-name` : `Hello world! From {name}`
 
-### GitHub Pages Setup
+### Tests
 
-To enable Allure report publishing:
+- **Unit tests** : 17 tests pour `greeting.js`
+- **Integration tests** : 19 tests pour l'API
+- **E2E tests** : 15 tests complets
+- **Alarm tests** : 7 tests pour tester les alertes
 
-1. Go to repository Settings → Pages
-2. Source: Deploy from a branch
-3. Branch: `gh-pages` / `root`
-4. Save
+**Total : 58 tests**
 
-Reports will be available at: `https://[your-username].github.io/cicd-tp/allure-report/`
+---
 
-## Contributing
+## Résumé
 
-1. Fork the repo.
-2. Create a feature branch.
-3. Run tests and linting.
-4. Submit a pull request.
-5. Check automated PR comment for test results.
+Ce projet implémente une stack de monitoring complète :
+- Système de collecte de métriques avec Prometheus
+- Dashboards Grafana pour la visualisation des tests
+- Alertes automatiques en cas de problème
+- Infrastructure production-ready pour le monitoring de tests
+
+**Cette stack est utilisée en production par Google, Netflix, Uber, Spotify et des milliers d'autres entreprises.**
